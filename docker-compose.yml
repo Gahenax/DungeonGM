@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  cripta-backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cripta-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1
+      - DATA_DIR=/app/data
+      - OLLAMA_HOST=http://cripta-ollama:11434
+    depends_on:
+      - cripta-ollama
+    networks:
+      - cripta-net
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  cripta-ollama:
+    image: ollama/ollama:latest
+    container_name: cripta-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama-data:/root/.ollama
+    networks:
+      - cripta-net
+    environment:
+      - OLLAMA_NUM_PARALLEL=2
+      - OLLAMA_NUM_GPU=0
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  cripta-ollama-helper:
+    image: ollama/ollama:latest
+    container_name: cripta-ollama-helper
+    depends_on:
+      cripta-ollama:
+        condition: service_healthy
+    networks:
+      - cripta-net
+    entrypoint: sh -c
+    command:
+      - |
+        echo "⏳ Pulling model..."
+        sleep 3
+        curl -X POST http://cripta-ollama:11434/api/pull \
+          -d '{"name":"qwen2.5:1.5b"}' || true
+        echo "✅ Done!"
+        exit 0
+
+volumes:
+  ollama-data:
+
+networks:
+  cripta-net:
+    driver: bridge
