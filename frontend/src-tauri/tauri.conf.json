@@ -1,0 +1,60 @@
+{
+  "productName": "Cripta DM",
+  "version": "0.1.0",
+  "identifier": "com.cripta.dm",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "beforeBuildCommand": "npm run build",
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../dist",
+    "files": [
+      "../dist/**",
+      "../src-tauri/icons/**/*"
+    ]
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "Cripta - D&D 5.5 Virtual DM",
+        "width": 1400,
+        "height": 900,
+        "minWidth": 1000,
+        "minHeight": 700,
+        "resizable": true,
+        "fullscreen": false,
+        "decorations": true,
+        "transparent": false,
+        "alwaysOnTop": false,
+        "focusable": true,
+        "visible": true,
+        "center": true
+      }
+    ],
+    "security": {
+      "csp": null,
+      "devCsp": null
+    },
+    "allowlist": {
+      "http": {
+        "all": true,
+        "scope": [
+          "http://localhost:*/*",
+          "http://127.0.0.1:*/*"
+        ]
+      },
+      "shell": {
+        "all": false,
+        "open": true
+      },
+      "process": {
+        "all": false,
+        "relaunch": true,
+        "relaunchDangerousAllowSymlinkMacos": true
+      },
+      "fs": {
+        "all": true,
+        "scope": ["$DOCUMENT/**", "$DOWNLOAD/**", "$APPDATA/**"]
+      }
+    }
+  }
+}
