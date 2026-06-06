@@ -2,6 +2,8 @@ import random
 import re
 from typing import Dict, List, Any
 
+_DICE_PATTERN = re.compile(r'(\d+)d(\d+)(?:([+-])(\d+))?')
+
 class DiceEngine:
     def __init__(self, seed=None):
         if seed:
@@ -11,7 +13,7 @@ class DiceEngine:
         """Roll dice: 1d20+5, 2d6-1, etc."""
         notation = notation.strip().replace(" ", "")
         
-        match = re.match(r'(\d+)d(\d+)(?:([+-])(\d+))?', notation)
+        match = _DICE_PATTERN.match(notation)
         if not match:
             raise ValueError(f"Invalid notation: {notation}")
         
