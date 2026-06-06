@@ -55,9 +55,3 @@ export async function getCurrentCharacter() {
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }
-
-export async function getCurrentCampaign() {
-  const res = await fetch(`${BACKEND_URL}/campaign/current`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
