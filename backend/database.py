@@ -1,5 +1,5 @@
 import json
-import sqlite3
+import aiosqlite
 from typing import Any, Dict, Optional
 
 
@@ -8,22 +8,21 @@ class Database:
         self.db_path = db_path
         self.connection = None
 
-    def initialize(self):
-        self.connection = sqlite3.connect(
+    async def initialize(self):
+        self.connection = await aiosqlite.connect(
             self.db_path,
-            check_same_thread=False,
             timeout=10.0,
         )
-        self.connection.row_factory = sqlite3.Row
-        self.connection.execute("PRAGMA journal_mode=WAL;")
-        self.connection.execute("PRAGMA synchronous=NORMAL;")
-        self._create_tables()
+        self.connection.row_factory = aiosqlite.Row
+        await self.connection.execute("PRAGMA journal_mode=WAL;")
+        await self.connection.execute("PRAGMA synchronous=NORMAL;")
+        await self._create_tables()
         print(f"Database: {self.db_path}")
 
-    def _create_tables(self):
-        cursor = self.connection.cursor()
+    async def _create_tables(self):
+        cursor = await self.connection.cursor()
 
-        cursor.execute(
+        await cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS campaigns (
                 id TEXT PRIMARY KEY,
@@ -38,7 +37,7 @@ class Database:
             """
         )
 
-        cursor.execute(
+        await cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS characters (
                 id TEXT PRIMARY KEY,
@@ -61,7 +60,7 @@ class Database:
             """
         )
 
-        cursor.execute(
+        await cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS actions (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -75,7 +74,7 @@ class Database:
             """
         )
 
-        cursor.execute(
+        await cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS rooms (
                 id TEXT PRIMARY KEY,
@@ -93,29 +92,29 @@ class Database:
             """
         )
 
-        self._ensure_column("campaigns", "current_room_id", "TEXT")
-        self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
+        await self._ensure_column("campaigns", "current_room_id", "TEXT")
+        await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
-        self.connection.commit()
+        await self.connection.commit()
 
-    def _ensure_column(self, table: str, column: str, definition: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"PRAGMA table_info({table})")
-        columns = {row["name"] for row in cursor.fetchall()}
+    async def _ensure_column(self, table: str, column: str, definition: str):
+        cursor = await self.connection.cursor()
+        await cursor.execute(f"PRAGMA table_info({table})")
+        columns = {row["name"] for row in await cursor.fetchall()}
         if column not in columns:
-            cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+            await cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
 
-    def close(self):
+    async def close(self):
         if self.connection:
-            self.connection.close()
+            await self.connection.close()
 
-    def get_campaign(self, campaign_id: Optional[str] = None) -> Dict:
-        cursor = self.connection.cursor()
+    async def get_campaign(self, campaign_id: Optional[str] = None) -> Dict:
+        cursor = await self.connection.cursor()
         if campaign_id:
-            cursor.execute("SELECT * FROM campaigns WHERE id = ?", (campaign_id,))
+            await cursor.execute("SELECT * FROM campaigns WHERE id = ?", (campaign_id,))
         else:
-            cursor.execute("SELECT * FROM campaigns ORDER BY created_at DESC LIMIT 1")
-        row = cursor.fetchone()
+            await cursor.execute("SELECT * FROM campaigns ORDER BY created_at DESC LIMIT 1")
+        row = await cursor.fetchone()
         if not row:
             return {}
         result = dict(row)
@@ -123,13 +122,13 @@ class Database:
             result["visited_rooms"] = json.loads(result["visited_rooms"])
         return result
 
-    def ensure_default_campaign(self) -> Dict:
-        campaign = self.get_campaign("campaign_1")
+    async def ensure_default_campaign(self) -> Dict:
+        campaign = await self.get_campaign("campaign_1")
         if campaign:
             return campaign
 
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = await self.connection.cursor()
+        await cursor.execute(
             """
             INSERT INTO campaigns
             (id, name, description, current_chapter, visited_rooms, seed)
@@ -144,16 +143,16 @@ class Database:
                 "campaign_1",
             ),
         )
-        self.connection.commit()
-        return self.get_campaign("campaign_1")
+        await self.connection.commit()
+        return await self.get_campaign("campaign_1")
 
-    def get_character(self, character_id: Optional[str] = None) -> Dict:
-        cursor = self.connection.cursor()
+    async def get_character(self, character_id: Optional[str] = None) -> Dict:
+        cursor = await self.connection.cursor()
         if character_id:
-            cursor.execute("SELECT * FROM characters WHERE id = ?", (character_id,))
+            await cursor.execute("SELECT * FROM characters WHERE id = ?", (character_id,))
         else:
-            cursor.execute("SELECT * FROM characters ORDER BY created_at DESC LIMIT 1")
-        row = cursor.fetchone()
+            await cursor.execute("SELECT * FROM characters ORDER BY created_at DESC LIMIT 1")
+        row = await cursor.fetchone()
         if row:
             result = dict(row)
             if result.get("equipment"):
@@ -161,13 +160,13 @@ class Database:
             return result
         return {}
 
-    def ensure_default_character(self, campaign_id: str = "campaign_1") -> Dict:
-        character = self.get_character("player_1")
+    async def ensure_default_character(self, campaign_id: str = "campaign_1") -> Dict:
+        character = await self.get_character("player_1")
         if character:
             return character
 
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = await self.connection.cursor()
+        await cursor.execute(
             """
             INSERT INTO characters
             (id, campaign_id, name, class, level, hp_max, hp_current, ac, str, dex, con, int, wis, cha, equipment)
@@ -191,25 +190,25 @@ class Database:
                 json.dumps(["torch", "shortsword", "rations"]),
             ),
         )
-        self.connection.commit()
-        return self.get_character("player_1")
+        await self.connection.commit()
+        return await self.get_character("player_1")
 
-    def get_room(self, room_id: str) -> Dict:
-        cursor = self.connection.cursor()
-        cursor.execute("SELECT * FROM rooms WHERE id = ?", (room_id,))
-        row = cursor.fetchone()
+    async def get_room(self, room_id: str) -> Dict:
+        cursor = await self.connection.cursor()
+        await cursor.execute("SELECT * FROM rooms WHERE id = ?", (room_id,))
+        row = await cursor.fetchone()
         return self._decode_room(row) if row else {}
 
-    def get_current_room(self, campaign_id: str) -> Dict:
-        campaign = self.get_campaign(campaign_id)
+    async def get_current_room(self, campaign_id: str) -> Dict:
+        campaign = await self.get_campaign(campaign_id)
         current_room_id = campaign.get("current_room_id")
         if not current_room_id:
             return {}
-        return self.get_room(current_room_id)
+        return await self.get_room(current_room_id)
 
-    def save_room(self, room: Dict[str, Any]) -> Dict:
-        cursor = self.connection.cursor()
-        cursor.execute(
+    async def save_room(self, room: Dict[str, Any]) -> Dict:
+        cursor = await self.connection.cursor()
+        await cursor.execute(
             """
             INSERT OR REPLACE INTO rooms
             (id, campaign_id, name, depth, description, feature, encounter, clue, exits, source_room_id)
@@ -228,17 +227,17 @@ class Database:
                 room.get("source_room_id"),
             ),
         )
-        self.connection.commit()
-        return self.get_room(room["id"])
+        await self.connection.commit()
+        return await self.get_room(room["id"])
 
-    def set_current_room(self, campaign_id: str, room_id: str):
-        campaign = self.get_campaign(campaign_id)
+    async def set_current_room(self, campaign_id: str, room_id: str):
+        campaign = await self.get_campaign(campaign_id)
         visited_rooms = campaign.get("visited_rooms") or []
         if room_id not in visited_rooms:
             visited_rooms.append(room_id)
 
-        cursor = self.connection.cursor()
-        cursor.execute(
+        cursor = await self.connection.cursor()
+        await cursor.execute(
             """
             UPDATE campaigns
             SET current_room_id = ?, visited_rooms = ?
@@ -246,11 +245,11 @@ class Database:
             """,
             (room_id, json.dumps(visited_rooms), campaign_id),
         )
-        self.connection.commit()
+        await self.connection.commit()
 
-    def log_action(self, campaign_id: str, action_data: Dict):
-        cursor = self.connection.cursor()
-        cursor.execute(
+    async def log_action(self, campaign_id: str, action_data: Dict):
+        cursor = await self.connection.cursor()
+        await cursor.execute(
             """
             INSERT INTO actions
             (campaign_id, character_id, action_type, description, result)
@@ -264,16 +263,16 @@ class Database:
                 action_data.get("result", ""),
             ),
         )
-        self.connection.commit()
+        await self.connection.commit()
 
-    def reset(self):
-        cursor = self.connection.cursor()
-        cursor.execute("DROP TABLE IF EXISTS rooms")
-        cursor.execute("DROP TABLE IF EXISTS actions")
-        cursor.execute("DROP TABLE IF EXISTS characters")
-        cursor.execute("DROP TABLE IF EXISTS campaigns")
-        self.connection.commit()
-        self._create_tables()
+    async def reset(self):
+        cursor = await self.connection.cursor()
+        await cursor.execute("DROP TABLE IF EXISTS rooms")
+        await cursor.execute("DROP TABLE IF EXISTS actions")
+        await cursor.execute("DROP TABLE IF EXISTS characters")
+        await cursor.execute("DROP TABLE IF EXISTS campaigns")
+        await self.connection.commit()
+        await self._create_tables()
 
     def _decode_room(self, row) -> Dict:
         result = dict(row)

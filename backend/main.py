@@ -20,12 +20,12 @@ async def lifespan(app: FastAPI):
     global db, orchestrator
     print("🎮 Starting Cripta...")
     db = Database(str(DB_PATH))
-    db.initialize()
+    await db.initialize()
     orchestrator = Orchestrator(db)
     print("✅ Ready!")
     yield
     if db:
-        db.close()
+        await db.close()
     print("🛑 Shutdown")
 
 app = FastAPI(
@@ -93,19 +93,19 @@ async def roll_dice(notation: str = "1d20"):
 async def get_current_campaign():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
-    return db.get_campaign()
+    return await db.get_campaign()
 
 @app.get("/character/current")
 async def get_current_character():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
-    return db.get_character()
+    return await db.get_character()
 
 @app.post("/debug/reset")
 async def reset_database():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
-    db.reset()
-    db.ensure_default_campaign()
-    db.ensure_default_character()
+    await db.reset()
+    await db.ensure_default_campaign()
+    await db.ensure_default_character()
     return {"success": True, "message": "Database reset"}

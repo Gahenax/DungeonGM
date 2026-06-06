@@ -20,9 +20,9 @@ class Orchestrator:
         print(f"Action: {action.action_type}: {action.description}")
 
         try:
-            campaign = self.db.ensure_default_campaign()
-            character = self.db.ensure_default_character(campaign["id"])
-            room = self._ensure_current_room(campaign["id"])
+            campaign = await self.db.ensure_default_campaign()
+            character = await self.db.ensure_default_character(campaign["id"])
+            room = await self._ensure_current_room(campaign["id"])
 
             if action.action_type == "combat":
                 result = await self._handle_combat(action, room)
@@ -48,7 +48,7 @@ class Orchestrator:
             }
             narrative = await self._generate_narrative(action, state)
 
-            self.db.log_action(
+            await self.db.log_action(
                 campaign["id"],
                 {
                     "character_id": action.character_id,
@@ -77,14 +77,14 @@ class Orchestrator:
                 "audio_url": None,
             }
 
-    def _ensure_current_room(self, campaign_id: str) -> Dict[str, Any]:
-        room = self.db.get_current_room(campaign_id)
+    async def _ensure_current_room(self, campaign_id: str) -> Dict[str, Any]:
+        room = await self.db.get_current_room(campaign_id)
         if room:
             return room
 
         room = self.generation_engine.initial_room(campaign_id)
-        saved_room = self.db.save_room(room)
-        self.db.set_current_room(campaign_id, saved_room["id"])
+        saved_room = await self.db.save_room(room)
+        await self.db.set_current_room(campaign_id, saved_room["id"])
         return saved_room
 
     async def _handle_combat(self, action, room) -> Dict[str, Any]:
@@ -116,8 +116,8 @@ class Orchestrator:
             depth=next_depth,
             source_room_id=current_room["id"],
         )
-        saved_room = self.db.save_room(room)
-        self.db.set_current_room(campaign_id, saved_room["id"])
+        saved_room = await self.db.save_room(room)
+        await self.db.set_current_room(campaign_id, saved_room["id"])
         return {
             "type": "exploration",
             "message": "A new room emerges from the dungeon seed.",
