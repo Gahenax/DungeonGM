@@ -1,6 +1,6 @@
 import random
 import re
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 class DiceEngine:
     def __init__(self, seed=None):
