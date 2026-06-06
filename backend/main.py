@@ -90,13 +90,13 @@ async def roll_dice(notation: str = "1d20"):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/campaign/current")
-async def get_current_campaign():
+def get_current_campaign():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
     return db.get_campaign()
 
 @app.get("/character/current")
-async def get_current_character():
+def get_current_character():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
     return db.get_character()
