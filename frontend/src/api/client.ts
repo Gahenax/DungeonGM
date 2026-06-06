@@ -50,12 +50,6 @@ export async function getGameStatus() {
   return res.json();
 }
 
-export async function getCurrentCharacter() {
-  const res = await fetch(`${BACKEND_URL}/character/current`);
-  if (!res.ok) throw new Error(`HTTP ${res.status}`);
-  return res.json();
-}
-
 export async function getCurrentCampaign() {
   const res = await fetch(`${BACKEND_URL}/campaign/current`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
