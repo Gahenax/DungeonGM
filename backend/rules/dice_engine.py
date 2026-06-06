@@ -1,6 +1,6 @@
 import random
 import re
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 _DICE_PATTERN = re.compile(r'(\d+)d(\d+)(?:([+-])(\d+))?')
 
