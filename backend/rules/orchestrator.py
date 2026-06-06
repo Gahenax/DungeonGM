@@ -17,7 +17,7 @@ class Orchestrator:
         self.generation_engine = GenerationEngine()
         self.ollama_host = os.getenv("OLLAMA_HOST", "http://cripta-ollama:11434")
         self.openai_api_key = os.getenv("OPENAI_API_KEY", "")
-        self.active_model = "gpt-4o-mini" if self.openai_api_key else "qwen2.5:1.5b"
+        self.active_model = "gpt-4o-mini" if self.openai_api_key else "my-model"
 
     async def process_action(self, action) -> Dict[str, Any]:
         print(f"Action: {action.action_type}: {action.description}")

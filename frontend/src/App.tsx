@@ -71,6 +71,7 @@ function App() {
             >
               <option value="gpt-4o-mini">GPT-4o-mini (OpenAI)</option>
               <option value="gpt-4o">GPT-4o (OpenAI)</option>
+              <option value="my-model">My Custom Model (Ollama)</option>
               <option value="qwen2.5:1.5b">Qwen2.5:1.5b (Ollama)</option>
               <option value="llama3">Llama 3 (Ollama)</option>
             </select>
