@@ -7,6 +7,7 @@ class Database:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.connection = None
+        self._schema_cache = {}
 
     def initialize(self):
         self.connection = sqlite3.connect(
@@ -99,11 +100,16 @@ class Database:
         self.connection.commit()
 
     def _ensure_column(self, table: str, column: str, definition: str):
-        cursor = self.connection.cursor()
-        cursor.execute(f"PRAGMA table_info({table})")
-        columns = {row["name"] for row in cursor.fetchall()}
+        if table not in self._schema_cache:
+            cursor = self.connection.cursor()
+            cursor.execute(f"PRAGMA table_info({table})")
+            self._schema_cache[table] = {row["name"] for row in cursor.fetchall()}
+
+        columns = self._schema_cache[table]
         if column not in columns:
+            cursor = self.connection.cursor()
             cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+            columns.add(column)
 
     def close(self):
         if self.connection:
@@ -273,6 +279,7 @@ class Database:
         cursor.execute("DROP TABLE IF EXISTS characters")
         cursor.execute("DROP TABLE IF EXISTS campaigns")
         self.connection.commit()
+        self._schema_cache.clear()
         self._create_tables()
 
     def _decode_room(self, row) -> Dict:
