@@ -8,8 +8,8 @@ from database import Database
 from models import ActionRequest, ActionResponse
 from rules.orchestrator import Orchestrator
 
-DATA_DIR = Path(os.getenv("DATA_DIR", "/app/data"))
-DATA_DIR.mkdir(exist_ok=True)
+DATA_DIR = Path(os.getenv("DATA_DIR", "data"))
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 DB_PATH = DATA_DIR / "campaigns.db"
 
 db = None
@@ -66,6 +66,8 @@ async def process_action(action: ActionRequest):
             message=result.get("message", ""),
             game_state=result.get("state", {}),
             narrative=result.get("narrative", ""),
+            generated_events=result.get("generated_events", []),
+            available_actions=result.get("available_actions", []),
             audio_url=result.get("audio_url")
         )
     except Exception as e:
@@ -104,4 +106,6 @@ async def reset_database():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
     db.reset()
+    db.ensure_default_campaign()
+    db.ensure_default_character()
     return {"success": True, "message": "Database reset"}

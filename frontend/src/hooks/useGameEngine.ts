@@ -1,18 +1,36 @@
-import { useState, useCallback } from "react";
+import { useCallback, useState } from "react";
 import { processAction, rollDice } from "../api/client";
+
+interface RoomState {
+  id: string;
+  name: string;
+  description: string;
+  clue?: string;
+}
+
+interface CharacterState {
+  hp_current?: number;
+  hp_max?: number;
+  ac?: number;
+  level?: number;
+}
 
 interface GameState {
   hp: number;
   maxHp: number;
   ac: number;
   level: number;
+  room?: RoomState;
+  character?: CharacterState;
 }
 
-interface ActionResult {
+export interface ActionResult {
   success: boolean;
   message: string;
   narrative: string;
-  game_state?: GameState;
+  game_state?: Partial<GameState>;
+  available_actions?: string[];
+  generated_events?: Array<Record<string, unknown>>;
 }
 
 export function useGameEngine() {
@@ -35,6 +53,9 @@ export function useGameEngine() {
           description,
           character_id: "player_1",
         });
+        if (result.game_state) {
+          setGameState((prev) => ({ ...prev, ...result.game_state }));
+        }
         return result;
       } catch (err) {
         const errorMsg = String(err);

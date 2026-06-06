@@ -6,6 +6,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 ENV/
 build/
 develop-eggs/
@@ -30,6 +31,11 @@ src-tauri/target/
 node_modules/
 .vite/
 dist/
+dist-tsconfig/
+.env
+backend/.env
+!.env.example
+!backend/.env.example
 .env.local
 .env.*.local
 

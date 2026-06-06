@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./CharacterSheet.css";
 
 interface Character {
@@ -36,7 +36,7 @@ const defaultCharacter: Character = {
 };
 
 export function CharacterSheet() {
-  const [character, setCharacter] = useState<Character>(defaultCharacter);
+  const [character] = useState<Character>(defaultCharacter);
   const [isExpanded, setIsExpanded] = useState(false);
 
   const calculateModifier = (score: number) => Math.floor((score - 10) / 2);

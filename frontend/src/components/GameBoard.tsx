@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import type { ActionResult } from "../hooks/useGameEngine";
 import "./GameBoard.css";
 
 interface ChatMessage {
@@ -9,7 +10,7 @@ interface ChatMessage {
 }
 
 interface GameBoardProps {
-  onAction: (actionType: string, description: string) => Promise<void>;
+  onAction: (actionType: string, description: string) => Promise<ActionResult | null>;
   loading: boolean;
 }
 
@@ -26,34 +27,33 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
   const [selectedAction, setSelectedAction] = useState<string>("combat");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
   useEffect(() => {
-    scrollToBottom();
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || loading) return;
 
-    // Add player message
+    const playerText = inputValue;
     const playerMsg: ChatMessage = {
       id: Date.now().toString(),
       role: "player",
-      text: inputValue,
+      text: playerText,
       timestamp: new Date(),
     };
     setMessages((prev) => [...prev, playerMsg]);
+    setInputValue("");
 
     try {
-      await onAction(selectedAction, inputValue);
-      // Add narrative response
+      const result = await onAction(selectedAction, playerText);
+      const availableActions = result?.available_actions?.length
+        ? `\n\nAvailable actions: ${result.available_actions.join(", ")}`
+        : "";
       const narratorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "narrator",
-        text: "The dungeon echoes with your action...",
+        text: `${result?.narrative || "The dungeon echoes with your action..."}${availableActions}`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, narratorMsg]);
@@ -61,19 +61,17 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
       const errorMsg: ChatMessage = {
         id: (Date.now() + 1).toString(),
         role: "narrator",
-        text: `Error: ${error}. The dungeon remains silent...",
+        text: `Error: ${error}. The dungeon remains silent...`,
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMsg]);
     }
-
-    setInputValue("");
   };
 
   return (
     <div className="game-board">
       <div className="board-header">
-        <h2>⚔️ Game Board</h2>
+        <h2>Game Board</h2>
         <div className="board-status">
           {loading && <span className="status-loading">Processing...</span>}
         </div>
@@ -82,7 +80,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
       <div className="chat-container">
         {messages.map((msg) => (
           <div key={msg.id} className={`message ${msg.role}`}>
-            <span className="role-badge">{msg.role === "narrator" ? "🧙‍♂️" : "⚔️"}</span>
+            <span className="role-badge">{msg.role === "narrator" ? "DM" : "PC"}</span>
             <p className="message-text">{msg.text}</p>
           </div>
         ))}
@@ -96,11 +94,11 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
           className="action-select"
           disabled={loading}
         >
-          <option value="combat">⚔️ Combat</option>
-          <option value="exploration">🔍 Explore</option>
-          <option value="social">💬 Social</option>
-          <option value="inventory">🎒 Inventory</option>
-          <option value="rest">🛌 Rest</option>
+          <option value="combat">Combat</option>
+          <option value="exploration">Explore</option>
+          <option value="social">Social</option>
+          <option value="inventory">Inventory</option>
+          <option value="rest">Rest</option>
         </select>
 
         <input
@@ -113,7 +111,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
         />
 
         <button type="submit" className="action-button" disabled={loading}>
-          {loading ? "⏳" : "→"}
+          {loading ? "..." : "Go"}
         </button>
       </form>
     </div>

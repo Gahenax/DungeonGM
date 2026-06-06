@@ -1,5 +1,4 @@
 import { invoke } from "@tauri-apps/api/core";
-import { appWindow } from "@tauri-apps/api/window";
 
 const BACKEND_URL = "http://localhost:8000";
 
@@ -40,7 +39,7 @@ export async function processAction(action: {
 }
 
 export async function rollDice(notation: string) {
-  const res = await fetch(`${BACKEND_URL}/dice/roll?notation=${notation}`);
+  const res = await fetch(`${BACKEND_URL}/dice/roll?notation=${encodeURIComponent(notation)}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return res.json();
 }

@@ -15,7 +15,7 @@ export function useBackend() {
         // Wait for services to be ready
         await new Promise(resolve => setTimeout(resolve, 3000));
         
-        const status = await getGameStatus();
+        await getGameStatus();
         setIsRunning(true);
         setError(null);
       } catch (err) {
