@@ -16,6 +16,8 @@ class Orchestrator:
         self.combat_engine = CombatEngine(self.dice_engine)
         self.generation_engine = GenerationEngine()
         self.ollama_host = os.getenv("OLLAMA_HOST", "http://cripta-ollama:11434")
+        self.openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        self.active_model = "gpt-4o-mini" if self.openai_api_key else "qwen2.5:1.5b"
 
     async def process_action(self, action) -> Dict[str, Any]:
         print(f"Action: {action.action_type}: {action.description}")
@@ -137,16 +139,38 @@ class Orchestrator:
 
         try:
             async with httpx.AsyncClient(timeout=15.0) as client:
-                resp = await client.post(
-                    f"{self.ollama_host}/api/generate",
-                    json={
-                        "model": "qwen2.5:1.5b",
-                        "prompt": prompt,
-                        "stream": False,
-                    },
-                )
-                if resp.status_code == 200:
-                    return resp.json().get("response", "")[:500]
+                if self.active_model.startswith("gpt-") and self.openai_api_key:
+                    headers = {
+                        "Authorization": f"Bearer {self.openai_api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    payload = {
+                        "model": self.active_model,
+                        "messages": [
+                            {"role": "system", "content": "You are the dungeon master for a solo D&D game. Narrate exactly 2 concise sentences in a dark fantasy tone."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "max_tokens": 150,
+                        "temperature": 0.7
+                    }
+                    resp = await client.post(
+                        "https://api.openai.com/v1/chat/completions",
+                        headers=headers,
+                        json=payload
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()["choices"][0]["message"]["content"][:500]
+                else:
+                    resp = await client.post(
+                        f"{self.ollama_host}/api/generate",
+                        json={
+                            "model": self.active_model,
+                            "prompt": prompt,
+                            "stream": False,
+                        },
+                    )
+                    if resp.status_code == 200:
+                        return resp.json().get("response", "")[:500]
         except Exception as e:
             print(f"LLM warning: {e}")
 

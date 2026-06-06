@@ -4,6 +4,9 @@ from contextlib import asynccontextmanager
 from typing import Annotated
 import os
 from pathlib import Path
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from database import Database
 from models import ActionRequest, ActionResponse
@@ -66,6 +69,22 @@ async def status():
         "database": "ready" if db else "not_initialized",
         "orchestrator": "ready" if orchestrator else "not_initialized"
     }
+
+@app.get("/model/active")
+async def get_active_model():
+    if not orchestrator:
+        raise HTTPException(status_code=503, detail="Backend not ready")
+    return {"active_model": orchestrator.active_model}
+
+@app.post("/model/active")
+async def set_active_model(data: dict):
+    if not orchestrator:
+        raise HTTPException(status_code=503, detail="Backend not ready")
+    model = data.get("model")
+    if not model:
+        raise HTTPException(status_code=400, detail="Model name required")
+    orchestrator.active_model = model
+    return {"success": True, "active_model": orchestrator.active_model}
 
 @app.post("/action", response_model=ActionResponse)
 async def process_action(action: ActionRequest):

@@ -100,6 +100,7 @@ async def test_process_action_error(orchestrator, mock_db):
 
 @pytest.mark.asyncio
 async def test_generate_narrative_success(orchestrator):
+    orchestrator.active_model = "qwen2.5:1.5b"
     # Mock HTTP client for successful LLM response
     class MockResponse:
         status_code = 200
@@ -122,6 +123,7 @@ async def test_generate_narrative_success(orchestrator):
 
 @pytest.mark.asyncio
 async def test_generate_narrative_fallback(orchestrator):
+    orchestrator.active_model = "qwen2.5:1.5b"
     # Mock HTTP client for failed LLM response
     class MockResponse:
         status_code = 500
@@ -143,6 +145,7 @@ async def test_generate_narrative_fallback(orchestrator):
 
 @pytest.mark.asyncio
 async def test_generate_narrative_exception(orchestrator):
+    orchestrator.active_model = "qwen2.5:1.5b"
     # Mock HTTP client to raise exception
     mock_client = AsyncMock()
     mock_client.post.side_effect = Exception("Connection timeout")
