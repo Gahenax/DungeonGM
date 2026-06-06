@@ -1,4 +1,5 @@
 import json
+import re
 import sqlite3
 from typing import Any, Dict, Optional
 
@@ -99,8 +100,15 @@ class Database:
         self.connection.commit()
 
     def _ensure_column(self, table: str, column: str, definition: str):
+        if not re.match(r"^[a-zA-Z0-9_]+$", table):
+            raise ValueError(f"Invalid table name: {table}")
+        if not re.match(r"^[a-zA-Z0-9_]+$", column):
+            raise ValueError(f"Invalid column name: {column}")
+        if not re.match(r"^[a-zA-Z0-9_ '(),.\-]+$", definition):
+            raise ValueError(f"Invalid column definition: {definition}")
+
         cursor = self.connection.cursor()
-        cursor.execute(f"PRAGMA table_info({table})")
+        cursor.execute("SELECT name FROM pragma_table_info(?)", (table,))
         columns = {row["name"] for row in cursor.fetchall()}
         if column not in columns:
             cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
