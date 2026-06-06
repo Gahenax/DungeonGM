@@ -8,6 +8,7 @@ class Database:
     def __init__(self, db_path: str):
         self.db_path = db_path
         self.connection = None
+        self._schema_cache = {}
 
     async def initialize(self):
         self.connection = await aiosqlite.connect(
@@ -106,11 +107,16 @@ class Database:
         if not re.match(r"^[a-zA-Z0-9_ '(),.\-]+$", definition):
             raise ValueError(f"Invalid column definition: {definition}")
 
-        cursor = await self.connection.cursor()
-        await cursor.execute("SELECT name FROM pragma_table_info(?)", (table,))
-        columns = {row["name"] for row in await cursor.fetchall()}
+        if table not in self._schema_cache:
+            cursor = await self.connection.cursor()
+            await cursor.execute("SELECT name FROM pragma_table_info(?)", (table,))
+            self._schema_cache[table] = {row["name"] for row in await cursor.fetchall()}
+
+        columns = self._schema_cache[table]
         if column not in columns:
+            cursor = await self.connection.cursor()
             await cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
+            columns.add(column)
 
     async def close(self):
         if self.connection:
@@ -280,6 +286,7 @@ class Database:
         await cursor.execute("DROP TABLE IF EXISTS characters")
         await cursor.execute("DROP TABLE IF EXISTS campaigns")
         await self.connection.commit()
+        self._schema_cache.clear()
         await self._create_tables()
 
     def _decode_room(self, row) -> Dict:
