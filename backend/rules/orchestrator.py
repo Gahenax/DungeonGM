@@ -1,4 +1,5 @@
 import os
+import asyncio
 from typing import Any, Dict
 
 import httpx
@@ -20,9 +21,9 @@ class Orchestrator:
         print(f"Action: {action.action_type}: {action.description}")
 
         try:
-            campaign = self.db.ensure_default_campaign()
-            character = self.db.ensure_default_character(campaign["id"])
-            room = self._ensure_current_room(campaign["id"])
+            campaign = await asyncio.to_thread(self.db.ensure_default_campaign)
+            character = await asyncio.to_thread(self.db.ensure_default_character, campaign["id"])
+            room = await asyncio.to_thread(self._ensure_current_room, campaign["id"])
 
             if action.action_type == "combat":
                 result = await self._handle_combat(action, room)
@@ -48,7 +49,8 @@ class Orchestrator:
             }
             narrative = await self._generate_narrative(action, state)
 
-            self.db.log_action(
+            await asyncio.to_thread(
+                self.db.log_action,
                 campaign["id"],
                 {
                     "character_id": action.character_id,
@@ -116,8 +118,8 @@ class Orchestrator:
             depth=next_depth,
             source_room_id=current_room["id"],
         )
-        saved_room = self.db.save_room(room)
-        self.db.set_current_room(campaign_id, saved_room["id"])
+        saved_room = await asyncio.to_thread(self.db.save_room, room)
+        await asyncio.to_thread(self.db.set_current_room, campaign_id, saved_room["id"])
         return {
             "type": "exploration",
             "message": "A new room emerges from the dungeon seed.",
