@@ -1,5 +1,5 @@
 import { useCallback, useState } from "react";
-import { processAction, rollDice } from "../api/client";
+import { processAction } from "../api/client";
 
 interface RoomState {
   id: string;
@@ -68,14 +68,5 @@ export function useGameEngine() {
     []
   );
 
-  const roll = useCallback(async (notation: string) => {
-    try {
-      return await rollDice(notation);
-    } catch (err) {
-      setError(String(err));
-      return null;
-    }
-  }, []);
-
-  return { gameState, loading, error, performAction, roll };
+  return { gameState, loading, error, performAction };
 }
