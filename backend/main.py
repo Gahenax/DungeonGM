@@ -68,12 +68,12 @@ async def status():
     }
 
 @app.post("/action", response_model=ActionResponse)
-async def process_action(action: ActionRequest):
+def process_action(action: ActionRequest):
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Backend not ready")
     
     try:
-        result = await orchestrator.process_action(action)
+        result = orchestrator.process_action(action)
         return ActionResponse(
             success=True,
             message=result.get("message", ""),
