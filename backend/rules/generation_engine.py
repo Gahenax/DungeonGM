@@ -79,4 +79,4 @@ class GenerationEngine:
         source_room_id: Optional[str],
     ) -> str:
         raw = f"{campaign_id}:{depth}:{theme}:{feature}:{source_room_id or 'start'}"
-        return hashlib.sha1(raw.encode("utf-8")).hexdigest()[:12]
+        return hashlib.sha256(raw.encode("utf-8")).hexdigest()[:12]
