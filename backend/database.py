@@ -1,4 +1,5 @@
 import json
+import re
 import aiosqlite
 from typing import Any, Dict, Optional
 
@@ -98,8 +99,15 @@ class Database:
         await self.connection.commit()
 
     async def _ensure_column(self, table: str, column: str, definition: str):
+        if not re.match(r"^[a-zA-Z0-9_]+$", table):
+            raise ValueError(f"Invalid table name: {table}")
+        if not re.match(r"^[a-zA-Z0-9_]+$", column):
+            raise ValueError(f"Invalid column name: {column}")
+        if not re.match(r"^[a-zA-Z0-9_ '(),.\-]+$", definition):
+            raise ValueError(f"Invalid column definition: {definition}")
+
         cursor = await self.connection.cursor()
-        await cursor.execute(f"PRAGMA table_info({table})")
+        await cursor.execute("SELECT name FROM pragma_table_info(?)", (table,))
         columns = {row["name"] for row in await cursor.fetchall()}
         if column not in columns:
             await cursor.execute(f"ALTER TABLE {table} ADD COLUMN {column} {definition}")
