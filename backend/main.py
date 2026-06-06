@@ -68,12 +68,12 @@ async def status():
     }
 
 @app.post("/action", response_model=ActionResponse)
-def process_action(action: ActionRequest):
+async def process_action(action: ActionRequest):
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Backend not ready")
     
     try:
-        result = orchestrator.process_action(action)
+        result = await orchestrator.process_action(action)
         return ActionResponse(
             success=True,
             message=result.get("message", ""),
@@ -103,13 +103,13 @@ async def roll_dice(notation: str = "1d20"):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/campaign/current")
-def get_current_campaign():
+async def get_current_campaign():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
     return await db.get_campaign()
 
 @app.get("/character/current")
-def get_current_character():
+async def get_current_character():
     if not db:
         raise HTTPException(status_code=503, detail="Database not ready")
     return await db.get_character()

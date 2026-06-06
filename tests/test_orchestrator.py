@@ -13,7 +13,7 @@ class MockAction:
 
 @pytest.fixture
 def mock_db():
-    db = Mock()
+    db = AsyncMock()
     db.ensure_default_campaign.return_value = {"id": "camp_1"}
     db.ensure_default_character.return_value = {"id": "char_1"}
     db.get_current_room.return_value = {

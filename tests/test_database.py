@@ -1,7 +1,8 @@
 import pytest
+import pytest_asyncio
 from backend.database import Database
 
-@pytest.fixture
+@pytest_asyncio.fixture
 async def db():
     database = Database(":memory:")
     await database.initialize()

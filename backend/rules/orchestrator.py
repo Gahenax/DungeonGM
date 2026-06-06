@@ -17,7 +17,7 @@ class Orchestrator:
         self.generation_engine = GenerationEngine()
         self.ollama_host = os.getenv("OLLAMA_HOST", "http://cripta-ollama:11434")
 
-    def process_action(self, action) -> Dict[str, Any]:
+    async def process_action(self, action) -> Dict[str, Any]:
         print(f"Action: {action.action_type}: {action.description}")
 
         try:
@@ -29,7 +29,7 @@ class Orchestrator:
                 result = self._handle_combat(action, room)
                 events = [result]
             elif action.action_type == "exploration":
-                result = self._handle_exploration(campaign["id"], room)
+                result = await self._handle_exploration(campaign["id"], room)
                 room = result["room"]
                 events = [{"type": "room_generated", "room_id": room["id"]}]
             else:
@@ -47,7 +47,7 @@ class Orchestrator:
                 "character": character,
                 "result": result,
             }
-            narrative = self._generate_narrative(action, state)
+            narrative = await self._generate_narrative(action, state)
 
             await self.db.log_action(
                 campaign["id"],
@@ -110,7 +110,7 @@ class Orchestrator:
             **combat_result,
         }
 
-    def _handle_exploration(self, campaign_id: str, current_room: Dict[str, Any]) -> Dict[str, Any]:
+    async def _handle_exploration(self, campaign_id: str, current_room: Dict[str, Any]) -> Dict[str, Any]:
         next_depth = int(current_room.get("depth", 0)) + 1
         room = self.generation_engine.generate_room(
             campaign_id=campaign_id,
@@ -125,7 +125,7 @@ class Orchestrator:
             "room": saved_room,
         }
 
-    def _generate_narrative(self, action, state) -> str:
+    async def _generate_narrative(self, action, state) -> str:
         room = state.get("room", {})
         prompt = (
             "You are the dungeon master for a solo D&D game. "
@@ -136,8 +136,8 @@ class Orchestrator:
         )
 
         try:
-            with httpx.Client(timeout=15.0) as client:
-                resp = client.post(
+            async with httpx.AsyncClient(timeout=15.0) as client:
+                resp = await client.post(
                     f"{self.ollama_host}/api/generate",
                     json={
                         "model": "qwen2.5:1.5b",

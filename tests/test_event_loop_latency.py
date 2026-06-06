@@ -15,7 +15,7 @@ class DummyAction:
 async def test_event_loop_latency(tmp_path):
     db_path = str(tmp_path / "test.db")
     db = Database(db_path)
-    db.initialize()
+    await db.initialize()
 
     orchestrator = Orchestrator(db)
     action = DummyAction("exploration", "I explore", "p1")
@@ -49,4 +49,4 @@ async def test_event_loop_latency(tmp_path):
         print(f"\nMax Event Loop Latency: {max_latency:.4f}s")
         print(f"Avg Event Loop Latency: {avg_latency:.4f}s")
 
-    db.close()
+    await db.close()

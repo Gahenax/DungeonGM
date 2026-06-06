@@ -15,7 +15,7 @@ class DummyAction:
 async def test_process_action_perf(tmp_path):
     db_path = str(tmp_path / "test.db")
     db = Database(db_path)
-    db.initialize()
+    await db.initialize()
 
     orchestrator = Orchestrator(db)
 
@@ -42,4 +42,4 @@ async def test_process_action_perf(tmp_path):
         end_time = time.time()
         print(f"\nExecution time for 50 concurrent actions: {end_time - start_time:.4f} seconds")
 
-    db.close()
+    await db.close()
