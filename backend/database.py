@@ -94,6 +94,21 @@ class Database:
             """
         )
 
+        # ⚡ Bolt: Add indexes on created_at to prevent O(n) table scans and sort
+        # operations when fetching the most recent campaign or character.
+        # This reduces query time for get_campaign() and get_character() to O(log n).
+        await cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at DESC)
+            """
+        )
+
+        await cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at DESC)
+            """
+        )
+
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
