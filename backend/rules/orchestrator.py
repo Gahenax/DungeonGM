@@ -17,6 +17,7 @@ class Orchestrator:
         self.generation_engine = GenerationEngine()
         self.ollama_host = os.getenv("OLLAMA_HOST", "http://cripta-ollama:11434")
         self.openai_api_key = os.getenv("OPENAI_API_KEY", "")
+        self.groq_api_key = os.getenv("GROQ_API_KEY", "")
         self.active_model = "gpt-4o-mini" if self.openai_api_key else "my-model"
 
     async def process_action(self, action) -> Dict[str, Any]:
@@ -155,6 +156,28 @@ class Orchestrator:
                     }
                     resp = await client.post(
                         "https://api.openai.com/v1/chat/completions",
+                        headers=headers,
+                        json=payload
+                    )
+                    if resp.status_code == 200:
+                        return resp.json()["choices"][0]["message"]["content"][:500]
+                elif self.active_model.startswith("groq/") and self.groq_api_key:
+                    headers = {
+                        "Authorization": f"Bearer {self.groq_api_key}",
+                        "Content-Type": "application/json"
+                    }
+                    model_name = self.active_model.replace("groq/", "")
+                    payload = {
+                        "model": model_name,
+                        "messages": [
+                            {"role": "system", "content": "You are the dungeon master for a solo D&D game. Narrate exactly 2 concise sentences in a dark fantasy tone."},
+                            {"role": "user", "content": prompt}
+                        ],
+                        "max_tokens": 150,
+                        "temperature": 0.7
+                    }
+                    resp = await client.post(
+                        "https://api.groq.com/openai/v1/chat/completions",
                         headers=headers,
                         json=payload
                     )
