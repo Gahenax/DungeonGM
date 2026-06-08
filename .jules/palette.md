@@ -1,0 +1,3 @@
+## 2025-02-20 - Keyboard Accessibility for Interactive Divs
+**Learning:** In the `CharacterSheet` component, the expand/collapse header was an interactive `div` acting as a toggle button without proper keyboard navigation or screen reader support. It's a common pattern to use `div`s for layout but forget they need `role="button"`, `tabIndex={0}`, keyboard event handlers (`onKeyDown`), and appropriate `aria-*` attributes (`aria-expanded`, `aria-controls`) to be accessible.
+**Action:** Always ensure that any non-button element with an `onClick` handler is also keyboard navigable and semantic by adding `role="button"`, `tabIndex`, keyboard event support (Space/Enter), and focus-visible styling.
