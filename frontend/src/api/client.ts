@@ -4,9 +4,13 @@ const BACKEND_URL = "http://localhost:8000";
 
 export async function startDockerBackend(): Promise<string> {
   try {
-    const result = await invoke<string>("start_docker_backend");
-    console.log("✅ Docker started:", result);
-    return result;
+    if (window.__TAURI_INTERNALS__) {
+      const result = await invoke<string>("start_docker_backend");
+      console.log("✅ Docker started:", result);
+      return result;
+    }
+    console.log("Not in Tauri, skipping Docker start");
+    return "Skipped";
   } catch (error) {
     console.error("❌ Error starting Docker:", error);
     throw error;
@@ -15,9 +19,13 @@ export async function startDockerBackend(): Promise<string> {
 
 export async function stopDockerBackend(): Promise<string> {
   try {
-    const result = await invoke<string>("stop_docker_backend");
-    console.log("✅ Docker stopped:", result);
-    return result;
+    if (window.__TAURI_INTERNALS__) {
+      const result = await invoke<string>("stop_docker_backend");
+      console.log("✅ Docker stopped:", result);
+      return result;
+    }
+    console.log("Not in Tauri, skipping Docker stop");
+    return "Skipped";
   } catch (error) {
     console.error("❌ Error stopping Docker:", error);
     throw error;
