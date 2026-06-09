@@ -1,0 +1,3 @@
+## 2024-06-09 - Accessible Expand/Collapse Toggles
+**Learning:** Interactive `div` elements used as collapsible headers in this app often lack keyboard accessibility and ARIA roles (e.g., `CharacterSheet.tsx`). Users navigating via keyboard cannot toggle these sections, and screen readers do not identify them as interactive buttons or report their expanded state.
+**Action:** When implementing custom interactive elements (like expand/collapse headers), always include `role="button"`, `tabIndex={0}`, an `onKeyDown` handler for 'Enter'/'Space', and appropriate ARIA attributes (e.g., `aria-expanded`).
