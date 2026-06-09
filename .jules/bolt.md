@@ -1,0 +1,3 @@
+## 2024-05-24 - Database indices on temporal columns
+**Learning:** When adding or modifying SQLite tables that are frequently queried for the most recent entry (e.g., using `ORDER BY created_at DESC LIMIT 1` in `get_campaign` and `get_character`), ensure a corresponding database index on the temporal column (`created_at`) is created. Without it, SQLite performs an O(N) full table scan.
+**Action:** Always add an index to temporal columns if they are going to be used in sorting/filtering for latest items (`ORDER BY ... DESC LIMIT ...`).
