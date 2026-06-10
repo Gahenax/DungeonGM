@@ -89,6 +89,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
 
       <form onSubmit={handleSubmit} className="action-form">
         <select
+          aria-label="Select action type"
           value={selectedAction}
           onChange={(e) => setSelectedAction(e.target.value)}
           className="action-select"
@@ -102,6 +103,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
         </select>
 
         <input
+          aria-label="Describe your action"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
