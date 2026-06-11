@@ -38,6 +38,8 @@ class Database:
             )
             """
         )
+        # Performance optimization: Add index for queries fetching recent entries (e.g., get_campaign)
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns (created_at DESC)")
 
         await cursor.execute(
             """
@@ -61,6 +63,8 @@ class Database:
             )
             """
         )
+        # Performance optimization: Add index for queries fetching recent entries (e.g., get_character)
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters (created_at DESC)")
 
         await cursor.execute(
             """
@@ -75,6 +79,8 @@ class Database:
             )
             """
         )
+        # Performance optimization: Add index to optimize chronological queries on action history
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_actions_created_at ON actions (created_at DESC)")
 
         await cursor.execute(
             """
@@ -93,6 +99,8 @@ class Database:
             )
             """
         )
+        # Performance optimization: Add index to optimize chronological queries on rooms
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_rooms_created_at ON rooms (created_at DESC)")
 
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
