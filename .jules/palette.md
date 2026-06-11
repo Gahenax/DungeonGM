@@ -1,0 +1,3 @@
+## 2024-05-18 - [Accessibility: Dynamic Game Narrative Feeds]
+**Learning:** Dynamic game narrative feeds (like the chat container in `GameBoard.tsx`) require `role="log"` and `aria-live="polite"`. Without these, screen readers will not automatically announce new DM and Player messages as the story unfolds, rendering the text-based RPG largely inaccessible to visually impaired users who rely on the narrative feed updating in real-time.
+**Action:** Always verify that frequently updating textual regions in game boards or chat-like interfaces use appropriate live region attributes (`aria-live`, `role="log"`, or `role="status"`) to ensure changes are announced correctly.
