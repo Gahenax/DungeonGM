@@ -1,0 +1,3 @@
+## 2025-06-12 - Optimize SQLite temporal queries with indices
+**Learning:** SQLite full table scans occur when executing queries with `ORDER BY created_at DESC LIMIT 1` (as frequently used in `get_campaign` and `get_character` without specific IDs) unless there is a matching index on the temporal column. The memory notes specify to add indices when temporal columns are queried this way to avoid O(n) table scans.
+**Action:** Created descending indices `idx_campaigns_created_at` and `idx_characters_created_at` in the `Database._create_tables` method to optimize performance to O(1)/O(log n). Apply this optimization pattern whenever introducing new tables accessed similarly.
