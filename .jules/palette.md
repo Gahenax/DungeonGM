@@ -1,0 +1,3 @@
+## 2024-05-18 - [Accessibility: Dynamic Game Narrative Feeds]
+**Learning:** For text-based RPG interfaces with dynamic game narrative feeds (such as the `.chat-container` in this app), screen readers require specific ARIA attributes (`role="log"` and `aria-live="polite"`) to automatically announce new incoming game messages to users relying on assistive technologies.
+**Action:** Always ensure that dynamic chat containers or narrative feeds in similar components include `role="log"` and `aria-live="polite"` to maintain screen reader accessibility.
