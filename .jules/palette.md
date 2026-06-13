@@ -1,0 +1,3 @@
+## 2024-11-23 - Dynamic Narrative Feed Accessibility
+**Learning:** For accessibility in text-based RPG interfaces, dynamic game narrative feeds (such as chat containers) require `role="log"` and `aria-live="polite"` to ensure screen readers automatically announce new messages as they stream in.
+**Action:** When creating text feeds or live chat logs, apply `role="log"` and `aria-live="polite"` to the scrollable container.
