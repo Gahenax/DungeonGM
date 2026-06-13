@@ -1,0 +1,3 @@
+## 2024-05-24 - [SQLite Sequential Scan Optimization]
+**Learning:** In the `backend/database.py` initialization, retrieving the most recent `campaigns` and `characters` implicitly uses `ORDER BY created_at DESC LIMIT 1`. Without an explicit database index on `created_at`, this queries a full sequential O(n) scan instead of O(1) indexed lookup, scaling very poorly on load.
+**Action:** When adding or modifying SQLite tables that are frequently queried for the most recent entry (e.g., using `ORDER BY created_at DESC LIMIT 1`), ensure a corresponding database index on the temporal column is created to prevent O(n) full table scans.
