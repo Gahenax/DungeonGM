@@ -94,6 +94,15 @@ class Database:
             """
         )
 
+        # Optimization: Add indexes on created_at for fast retrieval of the most recent entries
+        # This prevents O(n) table scans when getting the current campaign or character
+        await cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns (created_at DESC)"
+        )
+        await cursor.execute(
+            "CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters (created_at DESC)"
+        )
+
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
