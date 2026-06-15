@@ -94,6 +94,11 @@ class Database:
             """
         )
 
+        # Performance Optimization: Indexes for most-recent queries
+        # get_campaign and get_character frequently query using ORDER BY created_at DESC LIMIT 1
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at DESC)")
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at DESC)")
+
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
