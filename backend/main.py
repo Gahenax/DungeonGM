@@ -106,7 +106,7 @@ async def process_action(action: ActionRequest):
         raise HTTPException(status_code=400, detail=str(e))
 
 @app.get("/dice/roll")
-async def roll_dice(notation: str = "1d20"):
+def roll_dice(notation: str = "1d20"):
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Backend not ready")
     
