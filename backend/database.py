@@ -39,6 +39,9 @@ class Database:
             """
         )
 
+        # Index to optimize `ORDER BY created_at DESC LIMIT 1` in `get_campaign`
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at)")
+
         await cursor.execute(
             """
             CREATE TABLE IF NOT EXISTS characters (
@@ -61,6 +64,9 @@ class Database:
             )
             """
         )
+
+        # Index to optimize `ORDER BY created_at DESC LIMIT 1` in `get_character`
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at)")
 
         await cursor.execute(
             """
