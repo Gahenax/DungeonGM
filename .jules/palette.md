@@ -1,0 +1,3 @@
+## 2024-06-17 - Text-Based RPG Accessibility
+**Learning:** In text-based RPG interfaces with dynamic narrative feeds and compact action forms, it's crucial to add `role="log"` and `aria-live="polite"` to chat containers so screen readers announce new events. Additionally, inputs like action selectors or text inputs that omit visible labels for space reasons must explicitly use `aria-label` to maintain form accessibility.
+**Action:** When implementing or reviewing chat/narrative containers, always ensure dynamic regions have proper ARIA live roles. Ensure all form controls without visible text labels include `aria-label` or `aria-labelledby`.
