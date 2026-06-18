@@ -105,8 +105,10 @@ async def process_action(action: ActionRequest):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+# Performance optimization: Defined using `def` instead of `async def` so FastAPI runs this
+# synchronous computationally-bound task in a threadpool, preventing main event loop blockage.
 @app.get("/dice/roll")
-async def roll_dice(notation: str = "1d20"):
+def roll_dice(notation: str = "1d20"):
     if not orchestrator:
         raise HTTPException(status_code=503, detail="Backend not ready")
     
