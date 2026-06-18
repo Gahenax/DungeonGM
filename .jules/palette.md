@@ -1,0 +1,3 @@
+## 2024-06-18 - Accessible RPG Chat Feeds
+**Learning:** Dynamic text-based RPG interfaces (like chat containers) need to be accessible. By default, screen readers won't announce new messages dynamically added to the feed.
+**Action:** Always add `role="log"` and `aria-live="polite"` to chat feed container elements to ensure screen readers automatically announce new entries to visually impaired users without interrupting their current tasks. Also, ensure form inputs like `<select>` and `<input>` have explicit `aria-label` attributes if visible `<label>` elements are omitted to save space.
