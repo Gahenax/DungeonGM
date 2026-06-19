@@ -1,0 +1,3 @@
+## 2024-06-19 - Clickable `div` elements without proper a11y support
+**Learning:** React elements utilizing `onClick` logic on structural elements like `div` inherently lack semantic affordances, limiting keyboard navigability and visibility for screen readers within the application.
+**Action:** When working with structurally complex custom widgets with toggleable or collapsible contents (like `CharacterSheet`), structurally change the clickable headers to `<button type="button">`. Apply generic button reset CSS overrides (`background: none`, `border: none`, etc.) while ensuring standard interactive behaviors like `aria-expanded`, `aria-controls`, and `focus-visible` styling exist.
