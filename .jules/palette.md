@@ -1,0 +1,3 @@
+## 2024-06-22 - Converting Interactive Divs to Semantic Buttons
+**Learning:** When converting structural `<div>` elements with `onClick` handlers to semantic `<button>` tags for accessibility in this app, applying CSS reset properties (`background: none`, `border: none`, `color: inherit`, `font-family: inherit`, `width: 100%`, `text-align: left`, and `cursor: pointer`) ensures the layout and appearance remain identical. This must be paired with an appropriate `:focus-visible` state to ensure keyboard navigation is well-supported.
+**Action:** Always pair semantic `<button>` conversions with explicit CSS reset styles and focus outlines to maintain layout consistency while improving a11y.
