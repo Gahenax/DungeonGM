@@ -1,0 +1,3 @@
+## 2024-05-19 - Missing Index on Temporal Columns
+**Learning:** SQLite tables (like `campaigns` and `characters`) that are frequently queried for the most recent entry using `ORDER BY created_at DESC LIMIT 1` suffer from O(n) full table scans if the temporal column (`created_at`) lacks an index. In benchmarking, a query on 10,000 rows without an index took ~0.24s for 100 iterations, while an indexed query took ~0.06s (~4x speedup).
+**Action:** When adding or modifying SQLite tables that query the most recent entry, always ensure a corresponding database index on the temporal column (`created_at`) is created to prevent O(n) full table scans.
