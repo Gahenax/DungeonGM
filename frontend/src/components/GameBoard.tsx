@@ -77,7 +77,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
         </div>
       </div>
 
-      <div className="chat-container">
+      <div className="chat-container" role="log" aria-live="polite">
         {messages.map((msg) => (
           <div key={msg.id} className={`message ${msg.role}`}>
             <span className="role-badge">{msg.role === "narrator" ? "DM" : "PC"}</span>
@@ -89,6 +89,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
 
       <form onSubmit={handleSubmit} className="action-form">
         <select
+          aria-label="Action type"
           value={selectedAction}
           onChange={(e) => setSelectedAction(e.target.value)}
           className="action-select"
@@ -102,6 +103,7 @@ export function GameBoard({ onAction, loading }: GameBoardProps) {
         </select>
 
         <input
+          aria-label="Action description"
           type="text"
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
