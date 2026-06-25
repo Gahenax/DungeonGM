@@ -97,6 +97,11 @@ class Database:
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
+        # Create indexes for temporal queries (ORDER BY created_at DESC LIMIT 1)
+        # Expected to reduce query time from O(N) full table scan to O(log N)
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at DESC)")
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at DESC)")
+
         await self.connection.commit()
 
     async def _ensure_column(self, table: str, column: str, definition: str):
