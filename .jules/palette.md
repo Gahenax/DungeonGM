@@ -1,0 +1,3 @@
+## 2024-06-29 - Screen Reader Accessibility in Dynamic RPG Narrative Feeds
+**Learning:** For accessibility in text-based RPG interfaces, dynamic game narrative feeds (such as chat containers) require `role="log"` and `aria-live="polite"` to ensure screen readers automatically announce new messages without needing user intervention. Form inputs visually lacking labels to save space must include explicit `aria-label` attributes.
+**Action:** When creating or modifying chat or log containers in dynamic text interfaces, always verify they use appropriate ARIA live region attributes to make updates available to assistive technology. Ensure all interactive inputs have semantic or ARIA labels.
