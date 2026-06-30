@@ -1,0 +1,3 @@
+## 2024-05-18 - Add temporal indexes for most-recent queries
+**Learning:** SQLite tables that are frequently queried for the most recent entry using `ORDER BY created_at DESC LIMIT 1` suffer from O(n) full table scans if no index exists on the temporal column.
+**Action:** When creating or modifying such tables, always ensure a corresponding temporal index (`CREATE INDEX IF NOT EXISTS idx_... ON table(created_at)`) is created to improve query performance.
