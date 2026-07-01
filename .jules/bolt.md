@@ -1,0 +1,3 @@
+## 2024-06-11 - Database Indexes for `created_at`
+**Learning:** In the SQLite database wrapper (`backend/database.py`), the codebase pattern is to frequently query for the most recently created record using `ORDER BY created_at DESC LIMIT 1` (e.g. `get_campaign` without an ID or `get_character` without an ID). Without an index on `created_at`, SQLite must perform an O(n) table scan to sort all rows, which can become a bottleneck as campaigns grow.
+**Action:** When adding or modifying SQLite tables that are frequently queried for the most recent entry using `created_at`, ensure a corresponding database index (`CREATE INDEX IF NOT EXISTS`) is created for that column.
