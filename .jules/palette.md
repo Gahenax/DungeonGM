@@ -1,0 +1,3 @@
+## 2024-07-01 - Dynamic Game Narrative Feeds and Implicit Forms
+**Learning:** For accessibility in text-based RPG interfaces, dynamic game narrative feeds (such as chat containers) require `role="log"` and `aria-live="polite"` to ensure screen readers automatically announce new messages. Furthermore, form inputs like `<select>` and `<input>` must have explicit `aria-label` attributes if visible `<label>` elements are intentionally omitted to save UI space.
+**Action:** When implementing or modifying dynamic chat feeds, always apply `role="log"` and `aria-live="polite"`. When visible labels are not used in forms due to layout constraints, ensure `aria-label` is populated on inputs for screen reader users.
