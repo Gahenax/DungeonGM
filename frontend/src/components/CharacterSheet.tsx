@@ -43,7 +43,12 @@ export function CharacterSheet() {
 
   return (
     <div className={`character-sheet ${isExpanded ? "expanded" : "collapsed"}`}>
-      <div className="sheet-header" onClick={() => setIsExpanded(!isExpanded)}>
+      <button
+        className="sheet-header"
+        onClick={() => setIsExpanded(!isExpanded)}
+        aria-expanded={isExpanded}
+        aria-controls="character-sheet-body"
+      >
         <div className="header-main">
           <h3>{character.name}</h3>
           <span className="level-badge">Level {character.level}</span>
@@ -60,10 +65,10 @@ export function CharacterSheet() {
             <span className="stat-value">{character.ac}</span>
           </div>
         </div>
-      </div>
+      </button>
 
       {isExpanded && (
-        <div className="sheet-body">
+        <div id="character-sheet-body" className="sheet-body">
           <div className="sheet-section">
             <h4>Attributes</h4>
             <div className="attributes-grid">
