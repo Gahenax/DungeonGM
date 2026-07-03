@@ -1,0 +1,3 @@
+## 2024-07-03 - Converting Structural Headers to Accessible Buttons
+**Learning:** In React components like `CharacterSheet`, expandable sections are often implemented using a clickable `<div>` header. This lacks native keyboard accessibility (Tab focus and Enter/Space activation) and semantic meaning for screen readers.
+**Action:** When converting a structural `<div>` to a `<button>` for accessibility, apply CSS reset properties (`background: none`, `border: none`, `color: inherit`, `font-family: inherit`, `width: 100%`, `text-align: left`) to maintain the existing visual layout, and add a `:focus-visible` outline to ensure focus states are clearly visible for keyboard users. Ensure to add `aria-expanded` and `aria-controls` for screen reader context.
