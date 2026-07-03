@@ -1,0 +1,3 @@
+## 2024-07-03 - Database Indexes on Temporal Columns
+**Learning:** When adding or modifying SQLite tables that are frequently queried for the most recent entry using `ORDER BY created_at DESC LIMIT 1`, a corresponding database index on the temporal column must be created. Without it, SQLite performs O(n) full table scans which can severely bottleneck performance as the database grows.
+**Action:** Always verify if queries use `ORDER BY <column>` and ensure `CREATE INDEX IF NOT EXISTS` is applied to those columns in the schema setup, particularly for date/time fields used to fetch recent states.
