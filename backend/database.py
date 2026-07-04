@@ -38,6 +38,8 @@ class Database:
             )
             """
         )
+        # Prevent O(N) full table scans when querying the most recent campaign
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at DESC)")
 
         await cursor.execute(
             """
@@ -61,6 +63,8 @@ class Database:
             )
             """
         )
+        # Prevent O(N) full table scans when querying the most recent character
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at DESC)")
 
         await cursor.execute(
             """
