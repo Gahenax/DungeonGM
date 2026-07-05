@@ -1,0 +1,3 @@
+## 2025-01-20 - Missing Database Indexes for Most Recent Entries
+**Learning:** When adding or modifying SQLite tables that are frequently queried for the most recent entry (e.g., using `ORDER BY created_at DESC LIMIT 1` in `get_campaign` and `get_character`), an O(n) full table scan occurs if there is no corresponding database index on the temporal column. This becomes a bottleneck as the dataset grows.
+**Action:** Always ensure a corresponding index (`CREATE INDEX IF NOT EXISTS`) is created on temporal columns (like `created_at`) used in `ORDER BY ... DESC LIMIT 1` queries to maintain O(1)/O(log n) performance.
