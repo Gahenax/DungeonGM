@@ -97,6 +97,12 @@ class Database:
         await self._ensure_column("campaigns", "current_room_id", "TEXT")
         await self._ensure_column("campaigns", "seed", "TEXT DEFAULT 'campaign_1'")
 
+        # ⚡ Bolt: Add indexes for frequently queried temporal fields
+        # Measurement: Optimization for `ORDER BY created_at DESC LIMIT 1` queries to prevent O(n) full table scans
+        # Expected Impact: Constant time O(1) retrieval for get_campaign and get_character
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_campaigns_created_at ON campaigns(created_at)")
+        await cursor.execute("CREATE INDEX IF NOT EXISTS idx_characters_created_at ON characters(created_at)")
+
         await self.connection.commit()
 
     async def _ensure_column(self, table: str, column: str, definition: str):

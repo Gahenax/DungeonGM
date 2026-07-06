@@ -1,0 +1,3 @@
+## 2025-01-28 - Database Index for Temporal Queries
+**Learning:** Tables frequently queried with `ORDER BY created_at DESC LIMIT 1` (such as `campaigns` and `characters` in the backend) suffer from O(n) full table scans if the temporal column lacks an index.
+**Action:** When adding or modifying SQLite tables that depend on chronological retrieval, ensure a corresponding database index (`CREATE INDEX IF NOT EXISTS`) is applied to the temporal column to maintain O(1) performance and prevent event loop blocking in asynchronous code.
