@@ -1,0 +1,3 @@
+## 2024-07-07 - Semantic Buttons for Interactive Divs
+**Learning:** In React components with custom interactive headers (like `CharacterSheet`), using an `onClick` on a structural `div` element breaks keyboard accessibility and screen reader support. Converting it to a semantic `<button>` provides built-in focus, keyboard events (Enter/Space), and screen reader roles.
+**Action:** When converting `div` headers to `<button>` elements, always apply structural CSS resets (`background: none`, `border: none`, `color: inherit`, `font-family: inherit`, `width: 100%`, `text-align: left`) to maintain visual layout while gaining native accessibility benefits, and explicitly define `:focus-visible` states.
